@@ -15,8 +15,12 @@ spec:
       # into each stage namespace by platform-gitops scripts/seal-kargo-secrets.sh.
       imagePullSecrets:
         - name: harbor-pull
+      # The image's USER is "nonroot" (a name), which the kubelet can't check against
+      # runAsNonRoot - so give distroless's nonroot UID/GID (65532) explicitly.
       securityContext:
         runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
         seccompProfile: {type: RuntimeDefault}
       containers:
         - name: sample-app
