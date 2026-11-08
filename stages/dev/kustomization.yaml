@@ -1,0 +1,20 @@
+# Stage dev: namespace sample-app-dev, https://sample-app-dev.apps.lab.local
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: sample-app-dev
+resources:
+  - ../../base
+patches:
+  - target: {kind: Deployment, name: sample-app}
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: dev
+  - target: {kind: HTTPRoute, name: sample-app}
+    patch: |
+      - op: replace
+        path: /spec/hostnames/0
+        value: sample-app-dev.apps.lab.local

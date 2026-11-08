@@ -1,0 +1,38 @@
+# Render every stage with kustomize and schema-check the result, on pull requests and
+# pushes to main. (The stage/* branches are written by Kargo and aren't checked here.)
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  KUBECONFORM_VERSION: v0.7.0
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install kubeconform
+        run: |
+          curl -sSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" \
+            | tar xz -C /usr/local/bin kubeconform
+
+      # kustomize comes with the runner image.
+      - name: Render and check each stage
+        run: |
+          set -euo pipefail
+          for dir in stages/*/; do
+            echo "::group::$dir"
+            kustomize build "$dir" | kubeconform -strict -summary \
+              -schema-location default \
+              -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+              -
+            echo "::endgroup::"
+          done
