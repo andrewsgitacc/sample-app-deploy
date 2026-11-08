@@ -1,0 +1,11 @@
+# sample-app as deployed in every stage. The image tag here is a placeholder: Kargo sets
+# the tag of the Freight being promoted (kustomize-set-image) before rendering a stage.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - deployment.yaml
+  - service.yaml
+  - httproute.yaml
+images:
+  - name: harbor.apps.lab.local/sample-app/sample-app
+    newTag: main
