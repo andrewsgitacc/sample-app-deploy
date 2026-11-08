@@ -19,7 +19,7 @@ spec:
       - env:
         - name: APP_ENV
           value: dev
-        image: harbor.apps.lab.local/sample-app/sample-app:10b9d22
+        image: harbor.apps.lab.local/sample-app/sample-app:1105b74
         livenessProbe:
           httpGet:
             path: /healthz
